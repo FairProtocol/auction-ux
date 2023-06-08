@@ -6,7 +6,6 @@ import {
   FormState,
   RegisterOptions,
   UseFormClearErrors,
-  UseFormGetFieldState,
   UseFormRegister,
 } from 'react-hook-form'
 

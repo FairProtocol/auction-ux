@@ -43,7 +43,6 @@ const Error = styled.span`
 export function TextInput<FormValues>({
   clearErrors,
   formState,
-  getFieldState,
   name,
   placeholder,
   readOnly,
