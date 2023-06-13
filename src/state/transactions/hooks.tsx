@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
-import { TransactionResponse } from '@ethersproject/providers'
-import { SendTransactionResult } from '@wagmi/core'
+import { SendTransactionResult, WriteContractResult } from '@wagmi/core'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { addTransaction } from './actions'
@@ -14,7 +13,7 @@ const logger = getLogger('TX Debug Hooks')
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
-  response: TransactionResponse | SendTransactionResult,
+  response: WriteContractResult | SendTransactionResult,
   customData?: { summary?: string; approval?: { tokenAddress: string; spender: string } },
 ) => void {
   const { account, chainId } = useActiveWeb3React()
@@ -22,7 +21,7 @@ export function useTransactionAdder(): (
 
   return useCallback(
     (
-      response: TransactionResponse | SendTransactionResult,
+      response: WriteContractResult | SendTransactionResult,
       {
         approval,
         summary,

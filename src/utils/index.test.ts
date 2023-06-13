@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { JSBI, Percent } from '@josojo/honeyswap-sdk'
 
 import {
@@ -75,8 +74,8 @@ describe('utils', () => {
 
   describe('#calculateGasMargin', () => {
     it('adds 10%', () => {
-      expect(calculateGasMargin(BigNumber.from(1000)).toString()).toEqual('1100')
-      expect(calculateGasMargin(BigNumber.from(50)).toString()).toEqual('55')
+      expect(calculateGasMargin(BigInt(1000)).toString()).toEqual('1100')
+      expect(calculateGasMargin(BigInt(50)).toString()).toEqual('55')
     })
   })
 

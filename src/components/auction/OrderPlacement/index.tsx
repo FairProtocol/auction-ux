@@ -248,11 +248,14 @@ const OrderPlacement: React.FC<OrderPlacementProps> = (props) => {
       sellAmount,
     )
 
-    return sellAmountScaled
-      ?.mul(derivedAuctionInfo?.clearingPriceSellOrder?.buyAmount.raw.toString())
-      .lte(
-        buyAmountScaled?.mul(derivedAuctionInfo?.clearingPriceSellOrder?.sellAmount.raw.toString()),
-      )
+    return (
+      buyAmountScaled &&
+      sellAmountScaled &&
+      sellAmountScaled *
+        BigInt(derivedAuctionInfo?.clearingPriceSellOrder?.buyAmount.raw.toString()) <=
+        buyAmountScaled *
+          BigInt(derivedAuctionInfo?.clearingPriceSellOrder?.sellAmount.raw.toString())
+    )
   }
   const hasRiskNotCoveringClearingPrice =
     auctionState === AuctionState.ORDER_PLACING_AND_CANCELING &&

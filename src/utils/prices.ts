@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
 import { Token } from '@josojo/honeyswap-sdk'
 
 import { STABLE_TOKENS_FOR_INVERTED_CHARTS } from '../constants/config'
@@ -27,8 +26,8 @@ export function convertPriceIntoBuyAndSellAmount(
   price: string,
   sellAmount: string,
 ): {
-  sellAmountScaled: BigNumber | undefined
-  buyAmountScaled: BigNumber | undefined
+  sellAmountScaled: bigint | undefined
+  buyAmountScaled: bigint | undefined
 } {
   if (auctioningToken == undefined || biddingToken == undefined) {
     return {
@@ -44,11 +43,11 @@ export function convertPriceIntoBuyAndSellAmount(
   if (inversePriceAdjustedBybiddingToken == undefined) {
     return { sellAmountScaled: undefined, buyAmountScaled: undefined }
   }
-  const buyAmountScaled = BigNumber.from(sellAmountScaled.raw.toString())
-    .mul(BigNumber.from(10).pow(auctioningToken.decimals))
-    .div(inversePriceAdjustedBybiddingToken.raw.toString())
+  const buyAmountScaled =
+    (BigInt(sellAmountScaled.raw.toString()) * BigInt(10) ** BigInt(auctioningToken.decimals)) /
+    BigInt(inversePriceAdjustedBybiddingToken.raw.toString())
   return {
-    sellAmountScaled: BigNumber.from(sellAmountScaled.raw.toString()),
+    sellAmountScaled: BigInt(sellAmountScaled.raw.toString()),
     buyAmountScaled,
   }
 }

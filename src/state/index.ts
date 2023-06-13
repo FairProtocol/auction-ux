@@ -1,4 +1,4 @@
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 import { load, save } from 'redux-localstorage-simple'
 
 import application from './application/reducer'
@@ -22,7 +22,10 @@ const store = configureStore({
     orderbook,
     tokenList,
   },
-  middleware: [...getDefaultMiddleware(), save({ states: PERSISTED_KEYS })],
+  middleware: (getDefaultMiddleware) => [
+    ...getDefaultMiddleware(),
+    save({ states: PERSISTED_KEYS }),
+  ],
   preloadedState: load({ states: PERSISTED_KEYS }),
 })
 

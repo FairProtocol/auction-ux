@@ -4,10 +4,9 @@ import ArrowRightIcon from '../assets/images/arrow-right.svg'
 import CoinbaseWalletIcon from '../assets/images/coinbaseWalletIcon.svg'
 import GnosisSafeIcon from '../assets/images/gnosis-safe.svg'
 import MetamaskIcon from '../assets/images/metamask.svg'
-import PortisIcon from '../assets/images/portisIcon.png'
-import TrustWalletIcon from '../assets/images/trustWallet.png'
+// import TrustWalletIcon from '../assets/images/trustWallet.png'
 import WalletConnectIcon from '../assets/images/wallet-connect.svg'
-import { injected, portis, walletConnectConnector } from '../connectors'
+import { injected, walletConnectConnector } from '../connectors'
 
 export const chainNames = {
   1: 'Mainnet',
@@ -93,35 +92,26 @@ const MAINNET_WALLETS = {
 // Add again as SUPPORTED_WALLETS = [...EXTRA_WALLETS, ...MAIN_WALLETS]
 // When the times comes.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const EXTRA_WALLETS = {
-  COINBASE_LINK: {
-    name: 'Open in Coinbase Wallet',
-    icon: CoinbaseWalletIcon,
-    description: 'Open in Coinbase Wallet app.',
-    href: 'https://go.cb-w.com/mtUDhEZPy1',
-    color: '#315CF5',
-    mobile: true,
-    mobileOnly: true,
-  },
-  TRUST_WALLET_LINK: {
-    name: 'Open in Trust Wallet',
-    icon: TrustWalletIcon,
-    description: 'iOS and Android app.',
-    href: 'https://link.trustwallet.com/open_url?coin_id=60&url=https://uniswap.exchange/swap',
-    color: '#1C74CC',
-    mobile: true,
-    mobileOnly: true,
-  },
-  Portis: {
-    connector: portis,
-    name: 'Portis',
-    icon: PortisIcon,
-    description: 'Login using Portis hosted wallet',
-    href: null,
-    color: '#4A6C9B',
-    mobile: true,
-  },
-}
+// const EXTRA_WALLETS = {
+//   COINBASE_LINK: {
+//     name: 'Open in Coinbase Wallet',
+//     icon: CoinbaseWalletIcon,
+//     description: 'Open in Coinbase Wallet app.',
+//     href: 'https://go.cb-w.com/mtUDhEZPy1',
+//     color: '#315CF5',
+//     mobile: true,
+//     mobileOnly: true,
+//   },
+//   TRUST_WALLET_LINK: {
+//     name: 'Open in Trust Wallet',
+//     icon: TrustWalletIcon,
+//     description: 'iOS and Android app.',
+//     href: 'https://link.trustwallet.com/open_url?coin_id=60&url=https://uniswap.exchange/swap',
+//     color: '#1C74CC',
+//     mobile: true,
+//     mobileOnly: true,
+//   },
+// }
 export const WALLET_ICONS = {
   metaMask: MetamaskIcon,
   injected: ArrowRightIcon,

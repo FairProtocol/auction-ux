@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 
-import { BigNumber } from '@ethersproject/bignumber'
 import { Token } from '@josojo/honeyswap-sdk'
 import { prepareWriteContract, writeContract } from '@wagmi/core'
 
@@ -90,7 +89,7 @@ export function usePlaceOrderCallback(
           order: {
             buyAmount: buyAmountScaled,
             sellAmount: sellAmountScaled,
-            userId: BigNumber.from(0), // Todo: This could be optimized
+            userId: BigInt(0), // Todo: This could be optimized
           },
         })
       } catch (error) {
@@ -139,7 +138,7 @@ export function usePlaceOrderCallback(
           const order = {
             buyAmount: buyAmountScaled,
             sellAmount: sellAmountScaled,
-            userId: BigNumber.from(parseInt(userId?.toString() || '0')), // If many people are placing orders, this might be incorrect
+            userId: BigInt(parseInt(userId?.toString() || '0')), // If many people are placing orders, this might be incorrect
           }
           onNewOrder([
             {

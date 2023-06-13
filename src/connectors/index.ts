@@ -1,4 +1,3 @@
-import { PortisConnector } from '@web3-react/portis-connector'
 import { configureChains, createConfig } from 'wagmi'
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
 import { InjectedConnector } from 'wagmi/connectors/injected'
@@ -22,7 +21,7 @@ import {
   polygonMumbai,
   sepolia,
 } from './../utils/networkConfig'
-import { INFURA_KEY, PORTIS_ID, WALLET_CONNECT_PROJECT_ID } from '../constants/config'
+import { INFURA_KEY, WALLET_CONNECT_PROJECT_ID } from '../constants/config'
 
 const { chains, publicClient } = configureChains(
   [
@@ -95,10 +94,4 @@ chainIds.forEach((chainId: ChainId) => {
     urls[chainId] = `${NETWORK_CONFIGS[chainId].rpcUrls.default.http}`
     rpcs[chainId] = NETWORK_CONFIGS[chainId].rpcUrls.default.http
   }
-})
-
-// mainnet only
-export const portis = new PortisConnector({
-  dAppId: PORTIS_ID,
-  networks: [1],
 })

@@ -1,22 +1,9 @@
-import { getAddress } from '@ethersproject/address'
-import { BigNumber } from '@ethersproject/bignumber'
-import { AddressZero } from '@ethersproject/constants'
-import { Contract } from '@ethersproject/contracts'
-import { Provider, Web3Provider } from '@ethersproject/providers'
-import { parseBytes32String } from '@ethersproject/strings'
 import { JSBI, Percent, Token, TokenAmount, WETH } from '@josojo/honeyswap-sdk'
-import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.json'
-import { PublicClient } from 'viem'
+import { PublicClient, getAddress } from 'viem'
 
 import { ChainId, NETWORK_CONFIGS } from './networkConfig'
-import easyAuctionABI from '../constants/abis/easyAuction/easyAuction.json'
-import ERC20_ABI from '../constants/abis/erc20.json'
-import ERC20_BYTES32_ABI from '../constants/abis/erc20_bytes32.json'
-import { getLogger } from '../utils/logger'
 
 export { ChainId }
-
-const logger = getLogger('utils/index')
 
 // returns the checksummed address if the address is valid, otherwise returns false
 export function isAddress(value: any): string | false {
@@ -98,8 +85,8 @@ export function shortenAddress(address: string, chars = 4): string {
 }
 
 // add 10%
-export function calculateGasMargin(value: BigNumber): BigNumber {
-  return value.mul(BigNumber.from(10000).add(BigNumber.from(1000))).div(BigNumber.from(10000))
+export function calculateGasMargin(value: bigint): bigint {
+  return (value * (BigInt(10000) + BigInt(1000))) / BigInt(10000)
 }
 
 // converts a basis points value to a sdk percent
@@ -117,72 +104,8 @@ export function calculateSlippageAmount(value: TokenAmount, slippage: number): [
   ]
 }
 
-// account is optional
-export function getContract(address: string, ABI: any, provider: Provider): Contract {
-  if (!isAddress(address) || address === AddressZero) {
-    throw Error(`Invalid 'address' parameter '${address}'.`)
-  }
-
-  return new Contract(address, ABI, provider as Provider)
-}
-
-// account is optional
-export function getEasyAuctionContract(chainId: ChainId, library: Provider) {
-  return getContract(EASY_AUCTION_NETWORKS[chainId], easyAuctionABI, library)
-}
-
 export function getEasyAuctionAddress(chainId: ChainId) {
   return EASY_AUCTION_NETWORKS[chainId]
-}
-
-// account is optional
-export function getExchangeContract(pairAddress: string, library: Provider) {
-  return getContract(pairAddress, IUniswapV2PairABI, library)
-}
-
-// get token info and fall back to unknown if not available, except for the
-// decimals which falls back to null
-export async function getTokenInfoWithFallback(
-  tokenAddress: string,
-  library: Web3Provider,
-): Promise<{ name: string; symbol: string; decimals: null | number }> {
-  if (!isAddress(tokenAddress)) {
-    throw Error(`Invalid 'tokenAddress' parameter '${tokenAddress}'.`)
-  }
-
-  const token = getContract(tokenAddress, ERC20_ABI, library)
-
-  const namePromise: Promise<string> = token.name().catch(() =>
-    getContract(tokenAddress, ERC20_BYTES32_ABI, library)
-      .name()
-      .then(parseBytes32String)
-      .catch((e: Error) => {
-        logger.debug('Failed to get name for token address', e, tokenAddress)
-        return 'Unknown'
-      }),
-  )
-
-  const symbolPromise: Promise<string> = token.symbol().catch(() => {
-    const contractBytes32 = getContract(tokenAddress, ERC20_BYTES32_ABI, library)
-    return contractBytes32
-      .symbol()
-      .then(parseBytes32String)
-      .catch((e: Error) => {
-        logger.debug('Failed to get symbol for token address', e, tokenAddress)
-        return 'UNKNOWN'
-      })
-  })
-  const decimalsPromise: Promise<Maybe<number>> = token.decimals().catch((e: Error) => {
-    logger.debug('Failed to get decimals for token address', e, tokenAddress)
-    return null
-  })
-
-  const [name, symbol, decimals]: [string, string, Maybe<number>] = (await Promise.all([
-    namePromise,
-    symbolPromise,
-    decimalsPromise,
-  ])) as [string, string, Maybe<number>]
-  return { name, symbol, decimals }
 }
 
 export function escapeRegExp(string: string): string {

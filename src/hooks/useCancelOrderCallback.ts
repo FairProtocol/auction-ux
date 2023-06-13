@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 
-import { BigNumber } from '@ethersproject/bignumber'
 import { Fraction, Token } from '@josojo/honeyswap-sdk'
 import { prepareWriteContract, writeContract } from '@wagmi/core'
 
@@ -65,7 +64,7 @@ export function useCancelOrderCallback(
               abbreviation(
                 new Fraction(
                   decodedOrder.sellAmount.toString(),
-                  BigNumber.from(10).pow(biddingToken.decimals).toString(),
+                  (BigInt(10) ** BigInt(biddingToken.decimals)).toString(),
                 ).toSignificant(2),
               ) +
               ' ' +

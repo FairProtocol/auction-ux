@@ -6,7 +6,6 @@ import {
   NormalizedCacheObject,
   gql,
 } from '@apollo/client'
-import { BigNumber } from '@ethersproject/bignumber'
 
 import {
   GET_ALL_AUCTION_DETAILS,
@@ -118,7 +117,7 @@ export interface OrderBookData {
 
 export interface ClearingPriceAndVolumeData {
   clearingOrder: Order
-  volume: BigNumber
+  volume: bigint
 }
 export interface AdditionalServicesEndpoint {
   networkId: number
@@ -395,9 +394,9 @@ export class AdditionalServicesApiImpl implements AdditionalServicesApi {
       })
       order = sortedOrders[0]
       order = {
-        userId: BigNumber.from(order.userId),
-        buyAmount: BigNumber.from(order.buyAmount),
-        sellAmount: BigNumber.from(order.sellAmount),
+        userId: BigInt(order.userId),
+        buyAmount: BigInt(order.buyAmount),
+        sellAmount: BigInt(order.sellAmount),
       }
       return await encodeOrder(order)
     } catch (error) {
@@ -459,9 +458,9 @@ export class AdditionalServicesApiImpl implements AdditionalServicesApi {
       }
       return res.data.auctionDetail.orders.map((order) =>
         encodeOrder({
-          userId: BigNumber.from(order.userId),
-          buyAmount: BigNumber.from(order.buyAmount),
-          sellAmount: BigNumber.from(order.sellAmount),
+          userId: BigInt(order.userId),
+          buyAmount: BigInt(order.buyAmount),
+          sellAmount: BigInt(order.sellAmount),
         }),
       )
     } catch (error) {
@@ -530,20 +529,20 @@ export class AdditionalServicesApiImpl implements AdditionalServicesApi {
       ) {
         return {
           clearingOrder: {
-            sellAmount: BigNumber.from(auctionDetails.exactOrder.buyAmount),
-            buyAmount: BigNumber.from(auctionDetails.exactOrder.sellAmount),
-            userId: BigNumber.from('0'),
+            sellAmount: BigInt(auctionDetails.exactOrder.buyAmount),
+            buyAmount: BigInt(auctionDetails.exactOrder.sellAmount),
+            userId: BigInt('0'),
           },
-          volume: BigNumber.from('0'),
+          volume: BigInt(0),
         }
       }
       return {
         clearingOrder: {
-          sellAmount: BigNumber.from(auctionDetails.currentClearingOrderSellAmount),
-          buyAmount: BigNumber.from(auctionDetails.currentClearingOrderBuyAmount),
-          userId: BigNumber.from('0'),
+          sellAmount: BigInt(auctionDetails.currentClearingOrderSellAmount),
+          buyAmount: BigInt(auctionDetails.currentClearingOrderBuyAmount),
+          userId: BigInt('0'),
         },
-        volume: BigNumber.from(
+        volume: BigInt(
           Math.trunc(auctionDetails.currentVolume).toLocaleString('fullwide', {
             useGrouping: false,
             maximumSignificantDigits: 20,
