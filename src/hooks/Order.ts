@@ -1,14 +1,12 @@
-import { BigNumber } from '@ethersproject/bignumber'
-
 export interface SellOrder {
-  sellAmount: BigNumber
-  buyAmount: BigNumber
+  sellAmount: bigint
+  buyAmount: bigint
 }
 
 export interface Order {
-  sellAmount: BigNumber
-  buyAmount: BigNumber
-  userId: BigNumber
+  sellAmount: bigint
+  buyAmount: bigint
+  userId: bigint
 }
 
 export interface RawOrder {
@@ -20,23 +18,23 @@ export interface RawOrder {
 export function decodeOrder(bytes: string): Order {
   if (!bytes) {
     return {
-      userId: BigNumber.from(0),
-      buyAmount: BigNumber.from(0),
-      sellAmount: BigNumber.from(0),
+      userId: BigInt(0),
+      buyAmount: BigInt(0),
+      sellAmount: BigInt(0),
     }
   }
   return {
-    userId: BigNumber.from('0x' + bytes.substring(2, 18)),
-    buyAmount: BigNumber.from('0x' + bytes.substring(19, 42)),
-    sellAmount: BigNumber.from('0x' + bytes.substring(43, 66)),
+    userId: BigInt('0x' + bytes.substring(2, 18)),
+    buyAmount: BigInt('0x' + bytes.substring(19, 42)),
+    sellAmount: BigInt('0x' + bytes.substring(43, 66)),
   }
 }
 
 export function encodeOrder(order: Order): string {
   return (
     '0x' +
-    order.userId.toHexString().slice(2).padStart(16, '0') +
-    order.buyAmount.toHexString().slice(2).padStart(24, '0') +
-    order.sellAmount.toHexString().slice(2).padStart(24, '0')
+    order.userId.toString(16).slice(2).padStart(16, '0') +
+    order.buyAmount.toString(16).slice(2).padStart(24, '0') +
+    order.sellAmount.toString(16).slice(2).padStart(24, '0')
   )
 }

@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
-import { BigNumber } from '@ethersproject/bignumber'
 import { Fraction, Percent, Token, TokenAmount, Trade } from '@josojo/honeyswap-sdk'
 
 import { NUMBER_OF_DIGITS_FOR_INVERSION } from '../../../../constants/config'
@@ -102,7 +101,7 @@ const SwapModalFooter: React.FC<Props> = (props) => {
   if (sellAmount != undefined && buyAmountScaled != undefined) {
     minimumReceived = new Fraction(
       buyAmountScaled.toString(),
-      BigNumber.from(10).pow(auctioningToken.decimals).toString(),
+      (BigInt(10) ** BigInt(auctioningToken.decimals)).toString(),
     )
   }
 

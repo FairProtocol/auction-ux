@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { BigNumber } from '@ethersproject/bignumber'
-import { parseUnits } from '@ethersproject/units'
 import { ChainId, Fraction, JSBI, Token, TokenAmount } from '@josojo/honeyswap-sdk'
 import { useDispatch, useSelector } from 'react-redux'
+import { parseUnits } from 'viem'
 import { useContractRead } from 'wagmi'
 
 import {
@@ -80,12 +79,14 @@ export function orderToPrice(order: SellOrder | null | undefined): Fraction | un
     return undefined
   } else {
     return new Fraction(
-      BigNumber.from(order.sellAmount.raw.toString())
-        .mul(BigNumber.from('10').pow(order.buyAmount.token.decimals))
-        .toString(),
-      BigNumber.from(order.buyAmount.raw.toString())
-        .mul(BigNumber.from('10').pow(order.sellAmount.token.decimals))
-        .toString(),
+      (
+        BigInt(order.sellAmount.raw.toString()) *
+        BigInt('10') ** BigInt(order.buyAmount.token.decimals)
+      ).toString(),
+      (
+        BigInt(order.buyAmount.raw.toString()) *
+        BigInt('10') ** BigInt(order.sellAmount.token.decimals)
+      ).toString(),
     )
   }
 }
@@ -98,14 +99,8 @@ function decodeSellOrder(
   if (!orderBytes || !soldToken || !boughtToken) {
     return null
   }
-  const sellAmount = new Fraction(
-    BigNumber.from('0x' + orderBytes.substring(43, 66)).toString(),
-    '1',
-  )
-  const buyAmount = new Fraction(
-    BigNumber.from('0x' + orderBytes.substring(19, 42)).toString(),
-    '1',
-  )
+  const sellAmount = new Fraction(BigInt('0x' + orderBytes.substring(43, 66)).toString(), '1')
+  const buyAmount = new Fraction(BigInt('0x' + orderBytes.substring(19, 42)).toString(), '1')
   return {
     sellAmount: new TokenAmount(soldToken, sellAmount.toSignificant(6)),
     buyAmount: new TokenAmount(boughtToken, buyAmount.toSignificant(6)),
@@ -113,8 +108,8 @@ function decodeSellOrder(
 }
 
 const decodeSellOrderFromAPI = (
-  sellAmount: BigNumber | undefined,
-  buyAmount: BigNumber | undefined,
+  sellAmount: bigint | undefined,
+  buyAmount: bigint | undefined,
   soldToken: Token | undefined,
   boughtToken: Token | undefined,
 ): Maybe<SellOrder> => {
@@ -177,6 +172,7 @@ export function tryParseAmount(value?: string, token?: Token): TokenAmount | und
     return
   }
   try {
+    // @ts-ignore
     const sellAmountParsed = parseUnits(value, token.decimals).toString()
     if (sellAmountParsed !== '0') {
       return new TokenAmount(token, JSBI.BigInt(sellAmountParsed))
@@ -233,12 +229,12 @@ export const useGetOrderPlacementError = (
     price !== 'Infinity' &&
     sellAmount &&
     ((sellAmountScaled &&
-      BigNumber.from(derivedAuctionInfo?.minBiddingAmountPerOrder).gte(sellAmountScaled)) ||
+      BigInt(derivedAuctionInfo?.minBiddingAmountPerOrder) >= sellAmountScaled) ||
       parseFloat(sellAmount) == 0) &&
     `Amount must be bigger than
       ${new Fraction(
         derivedAuctionInfo?.minBiddingAmountPerOrder,
-        BigNumber.from(10).pow(derivedAuctionInfo?.biddingToken.decimals).toString(),
+        (BigInt(10) ** BigInt(derivedAuctionInfo?.biddingToken.decimals)).toString(),
       ).toSignificant(2)}`
 
   const invalidAmount = sellAmount && !amountIn && `Invalid Amount`
@@ -276,11 +272,11 @@ export const useGetOrderPlacementError = (
     derivedAuctionInfo?.biddingToken !== undefined &&
     auctionState === AuctionState.ORDER_PLACING &&
     buyAmountScaled &&
-    sellAmountScaled
-      ?.mul(derivedAuctionInfo?.clearingPriceSellOrder?.buyAmount.raw.toString())
-      .lte(
-        buyAmountScaled.mul(derivedAuctionInfo?.clearingPriceSellOrder?.sellAmount.raw.toString()),
-      )
+    sellAmountScaled &&
+    sellAmountScaled *
+      BigInt(derivedAuctionInfo?.clearingPriceSellOrder?.buyAmount.raw.toString()) <=
+      buyAmountScaled *
+        BigInt(derivedAuctionInfo?.clearingPriceSellOrder?.sellAmount.raw.toString())
       ? showPricesInverted
         ? `Price must be lower than ${derivedAuctionInfo?.clearingPrice?.invert().toSignificant(5)}`
         : messageHigherClearingPrice
@@ -293,9 +289,9 @@ export const useGetOrderPlacementError = (
     derivedAuctionInfo?.auctioningToken !== undefined &&
     derivedAuctionInfo?.biddingToken !== undefined &&
     buyAmountScaled &&
-    sellAmountScaled
-      ?.mul(derivedAuctionInfo?.initialAuctionOrder?.sellAmount.raw.toString())
-      .lte(buyAmountScaled.mul(derivedAuctionInfo?.initialAuctionOrder?.buyAmount.raw.toString()))
+    sellAmountScaled &&
+    sellAmountScaled * BigInt(derivedAuctionInfo?.initialAuctionOrder?.sellAmount.raw.toString()) <=
+      buyAmountScaled * BigInt(derivedAuctionInfo?.initialAuctionOrder?.buyAmount.raw.toString())
       ? showPricesInverted
         ? `Price must be lower than ${derivedAuctionInfo?.initialPrice?.invert().toSignificant(5)}`
         : messageHigherInitialPrice
@@ -363,7 +359,7 @@ export interface DerivedAuctionInfo {
   initialAuctionOrder: Maybe<SellOrder>
   auctionEndDate: number | undefined
   auctionStartDate: number | undefined
-  clearingPriceVolume: BigNumber | undefined
+  clearingPriceVolume: bigint | undefined
   initialPrice: Fraction | undefined
   minBiddingAmountPerOrder: string | undefined
   orderCancellationEndDate: number | undefined
@@ -429,7 +425,7 @@ export function useDerivedAuctionInfo(
   )
 
   const minBiddingAmountPerOrder = useMemo(
-    () => BigNumber.from(auctionDetails?.minimumBiddingAmountPerOrder ?? 0).toString(),
+    () => BigInt(auctionDetails?.minimumBiddingAmountPerOrder ?? 0).toString(),
     [auctionDetails],
   )
 
@@ -444,12 +440,14 @@ export function useDerivedAuctionInfo(
       initialPrice = undefined
     } else {
       initialPrice = new Fraction(
-        BigNumber.from(initialAuctionOrder?.buyAmount?.raw.toString())
-          .mul(BigNumber.from('10').pow(initialAuctionOrder?.sellAmount?.token.decimals))
-          .toString(),
-        BigNumber.from(initialAuctionOrder?.sellAmount?.raw.toString())
-          .mul(BigNumber.from('10').pow(initialAuctionOrder?.buyAmount?.token.decimals))
-          .toString(),
+        (
+          BigInt(initialAuctionOrder?.buyAmount?.raw.toString()) *
+          BigInt('10') ** BigInt(initialAuctionOrder?.sellAmount?.token.decimals)
+        ).toString(),
+        (
+          BigInt(initialAuctionOrder?.sellAmount?.raw.toString()) *
+          BigInt('10') ** BigInt(initialAuctionOrder?.buyAmount?.token.decimals)
+        ).toString(),
       )
     }
     return initialPrice
@@ -686,7 +684,7 @@ export function useAllUserOrders(
         const order = decodeOrder(orderString)
 
         // in some of the orders the buyAmount field is zero
-        if (order.buyAmount.isZero()) {
+        if (order.buyAmount === BigInt(0)) {
           logger.error(`Order buyAmount shouldn't be zero`)
           continue
         }
@@ -695,11 +693,11 @@ export function useAllUserOrders(
           id: orderString,
           sellAmount: new Fraction(
             order.sellAmount.toString(),
-            BigNumber.from(10).pow(biddingToken.decimals).toString(),
+            (BigInt(10) ** BigInt(biddingToken.decimals)).toString(),
           ).toSignificant(6),
           price: new Fraction(
-            order.sellAmount.mul(BigNumber.from(10).pow(auctioningToken.decimals)).toString(),
-            order.buyAmount.mul(BigNumber.from(10).pow(biddingToken.decimals)).toString(),
+            (order.sellAmount * BigInt(10) ** BigInt(auctioningToken.decimals)).toString(),
+            (order.buyAmount * BigInt(10) ** BigInt(biddingToken.decimals)).toString(),
           ).toSignificant(6),
           chainId,
           status: OrderStatus.PLACED,

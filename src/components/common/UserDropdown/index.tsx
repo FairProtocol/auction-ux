@@ -1,8 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { WalletConnectConnector } from '@anxolin/walletconnect-connector'
-
 import { useActiveWeb3React } from '../../../hooks'
 import { useDarkModeManager } from '../../../state/user/hooks'
 import { getChainName, truncateStringInTheMiddle } from '../../../utils/tools'
@@ -185,9 +183,7 @@ export const UserDropdown: React.FC<Props> = (props) => {
 
   const disconnect = React.useCallback(async () => {
     deactivate()
-    if (connector instanceof WalletConnectConnector && typeof connector.close === 'function') {
-      connector.close()
-      connector.walletConnectProvider = null
+    if (connector.id === 'walletConnect') {
       localStorage.removeItem('walletconnect')
     }
   }, [connector, deactivate])

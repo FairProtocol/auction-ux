@@ -1,5 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber'
-
 import { encodeOrder } from '../hooks/Order'
 import { AuctionInfo } from '../hooks/useAllAuctionInfos'
 import { AuctionInfoDetail } from '../hooks/useAuctionDetails'
@@ -12,9 +10,9 @@ const formatAuctionInfoFromApi = (auctionData): AuctionInfo => {
       volume: parseFloat(auctionData.exactOrder.volume),
     },
     exactOrder: encodeOrder({
-      sellAmount: BigNumber.from(auctionData.exactOrder.sellAmount),
-      buyAmount: BigNumber.from(auctionData.exactOrder.buyAmount),
-      userId: BigNumber.from(0),
+      sellAmount: BigInt(auctionData.exactOrder.sellAmount),
+      buyAmount: BigInt(auctionData.exactOrder.buyAmount),
+      userId: BigInt(0),
     }),
     symbolAuctioningToken: auctionData.symbolAuctioningToken,
     symbolBiddingToken: auctionData.symbolBiddingToken,

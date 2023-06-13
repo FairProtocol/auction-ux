@@ -2,7 +2,6 @@ import { rgba } from 'polished'
 import React, { useMemo, useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { BigNumber } from '@ethersproject/bignumber'
 import { Fraction, TokenAmount } from '@josojo/honeyswap-sdk'
 
 import { useAuctionDetails } from '../../../hooks/useAuctionDetails'
@@ -347,7 +346,7 @@ const AuctionDetails = (props: Props) => {
       auctionDetails &&
       new Fraction(
         auctionDetails.currentBiddingAmount,
-        BigNumber.from('10').pow(auctionDetails.decimalsBiddingToken).toString(),
+        (BigInt(10) ** BigInt(auctionDetails.decimalsBiddingToken)).toString(),
       ).divide(derivedAuctionInfo?.clearingPrice || '0'),
     [auctionDetails, derivedAuctionInfo],
   )
@@ -379,8 +378,8 @@ const AuctionDetails = (props: Props) => {
             ? auctionDetails.minFundingThreshold === '0x0'
               ? '-'
               : new Fraction(
-                  BigNumber.from(auctionDetails.currentBiddingAmount).mul(100).toString(),
-                  BigNumber.from(auctionDetails.minFundingThreshold).toString(),
+                  (BigInt(auctionDetails.currentBiddingAmount) * BigInt(100)).toString(),
+                  BigInt(auctionDetails.minFundingThreshold).toString(),
                 )
                   .toSignificant(2)
                   .concat('%')
@@ -403,9 +402,9 @@ const AuctionDetails = (props: Props) => {
             ? tokenSold
                 .multiply(
                   new Fraction(
-                    BigNumber.from('10')
-                      .pow(derivedAuctionInfo.auctioningToken.decimals + 2)
-                      .toString(),
+                    (
+                      BigInt('10') ** BigInt(derivedAuctionInfo.auctioningToken.decimals + 2)
+                    ).toString(),
                     derivedAuctionInfo?.initialAuctionOrder?.sellAmount.raw.toString(),
                   ),
                 )

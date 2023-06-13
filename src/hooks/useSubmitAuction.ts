@@ -8,6 +8,7 @@ import { useAccount, useBalance, useContractRead, useNetwork } from 'wagmi'
 import { useAuctionForm } from './useAuctionForm'
 import EASY_AUCTION_ABI from '../constants/abis/easyAuction/easyAuction.json'
 import ERC20_ABI from '../constants/abis/erc20.json'
+import { ZeroAddress } from '../constants/config'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { ALLOW_LIST_OFF_CHAIN_MANAGED, getEasyAuctionAddress } from '../utils'
 import { getLogger } from '../utils/logger'
@@ -167,7 +168,7 @@ export const useSubmitAuction = () => {
       isWhiteListingProcessUsed
         ? // @ts-ignore
           ALLOW_LIST_OFF_CHAIN_MANAGED[chainId]
-        : '0x0000000000000000000000000000000000000000',
+        : ZeroAddress,
       isWhiteListingProcessUsed
         ? // @ts-ignore
           encodeAbiParameters(parseAbiParameters('address'), [allowListData])

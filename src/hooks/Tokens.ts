@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Token, WETH } from '@josojo/honeyswap-sdk'
 
 import { useActiveWeb3React } from './index'
+import { ZeroAddress } from '../constants/config'
 import { useAddUserToken, useFetchTokenByAddress, useUserAddedTokens } from '../state/user/hooks'
 import { ChainId, isAddress } from '../utils'
 
@@ -52,7 +53,7 @@ export function useTokenByAddressAndAutomaticallyAdd(tokenAddress?: string): {
     const weth = WETH[chainId as ChainId]
     if (weth && weth.address === isAddress(tokenAddress)) return
 
-    if (tokenAddress && tokenAddress != '0x0000000000000000000000000000000000000000' && !token) {
+    if (tokenAddress && tokenAddress != ZeroAddress && !token) {
       setIsLoading(true)
       fetchTokenByAddress(tokenAddress)
         .then((token) => {

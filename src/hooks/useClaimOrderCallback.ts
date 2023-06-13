@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { BigNumber } from '@ethersproject/bignumber'
 import { Token, TokenAmount } from '@josojo/honeyswap-sdk'
 import { useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi'
 
@@ -102,7 +101,7 @@ interface getClaimableDataProps {
   clearingPriceOrder: Order
   ordersFromUser: string[]
   minFundingThresholdNotReached: boolean
-  clearingPriceVolume: BigNumber
+  clearingPriceVolume: bigint
 }
 export const getClaimableData = ({
   auctioningToken,
@@ -127,38 +126,37 @@ export const getClaimableData = ({
       // Order from the same user, buyAmount and sellAmount
     } else {
       if (JSON.stringify(decodedOrder) === JSON.stringify(clearingPriceOrder)) {
-        if (sellAmount.sub(clearingPriceVolume).gt(0)) {
+        if (sellAmount - clearingPriceVolume > BigInt(0)) {
           claimableBiddingToken = claimableBiddingToken.add(
-            new TokenAmount(biddingToken, sellAmount.sub(clearingPriceVolume).toString()),
+            new TokenAmount(biddingToken, (sellAmount - clearingPriceVolume).toString()),
           )
         }
         claimableAuctioningToken = claimableAuctioningToken.add(
           new TokenAmount(
             auctioningToken,
-            clearingPriceVolume
-              .mul(clearingPriceOrder.buyAmount)
-              .div(clearingPriceOrder.sellAmount)
-              .toString(),
+            (
+              (clearingPriceVolume * clearingPriceOrder.buyAmount) /
+              clearingPriceOrder.sellAmount
+            ).toString(),
           ),
         )
       } else if (
-        clearingPriceOrder.buyAmount
-          .mul(sellAmount)
-          .lt(buyAmount.mul(clearingPriceOrder.sellAmount))
+        clearingPriceOrder.buyAmount * sellAmount <
+        buyAmount * clearingPriceOrder.sellAmount
       ) {
         claimableBiddingToken = claimableBiddingToken.add(
           new TokenAmount(biddingToken, sellAmount.toString()),
         )
       } else {
         // (orders[i].smallerThan(auction.clearingPriceOrder)
-        if (clearingPriceOrder.sellAmount.gt(BigNumber.from('0'))) {
+        if (clearingPriceOrder.sellAmount > BigInt('0')) {
           claimableAuctioningToken = claimableAuctioningToken.add(
             new TokenAmount(
               auctioningToken,
-              sellAmount
-                .mul(clearingPriceOrder.buyAmount)
-                .div(clearingPriceOrder.sellAmount)
-                .toString(),
+              (
+                (sellAmount * clearingPriceOrder.buyAmount) /
+                clearingPriceOrder.sellAmount
+              ).toString(),
             ),
           )
         }

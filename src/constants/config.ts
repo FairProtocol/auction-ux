@@ -66,6 +66,7 @@ export const PINATA_QUERY_URL = 'https://gateway.pinata.cloud/ipfs/'
 export const PINATA_PIN_JSON_URL = `${PINATA_BASE_URL}pinning/pinJSONToIPFS`
 
 export const isDev = process.env.NODE_ENV === 'development'
+export const ZeroAddress = '0x0000000000000000000000000000000000000000'
 
 export const STABLE_TOKENS_FOR_INVERTED_CHARTS = [
   '0x6B175474E89094C44Da98b954EedeAC495271d0F',
